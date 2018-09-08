@@ -1,5 +1,5 @@
 /*!
-* svg.resize.js - An extension for svg.js which allows to resize elements which are selected
+* @4keys/svg.resize.js - An extension for svg.js which allows to resize elements which are selected
 * @version 1.4.2
 * https://github.com/svgdotjs/svg.resize.js
 *
@@ -175,7 +175,7 @@
                             return;
                         }
 
-                        snap = this.checkAspectRatio(snap);
+                        snap = this.checkAspectRatio(snap, true);
 
                         this.el.move(this.parameters.box.x, this.parameters.box.y + snap[1]).size(this.parameters.box.width + snap[0], this.parameters.box.height - snap[1]);
                     }
@@ -213,7 +213,7 @@
                             return;
                         }
 
-                        snap = this.checkAspectRatio(snap);
+                        snap = this.checkAspectRatio(snap, true);
 
                         this.el.move(this.parameters.box.x + snap[0], this.parameters.box.y).size(this.parameters.box.width - snap[0], this.parameters.box.height + snap[1]);
                     }
@@ -393,8 +393,14 @@
             // We check if the flag is set and if not we set a default-value (both bits set - which means upper-left-edge)
             flag = flag == null ? 1 | 1 << 1 : flag;
             temp = [(this.parameters.box.x + diffX + (flag & 1 ? 0 : this.parameters.box.width)) % this.options.snapToGrid, (this.parameters.box.y + diffY + (flag & (1 << 1) ? 0 : this.parameters.box.height)) % this.options.snapToGrid];
-        }
 
+            if(diffX < 0) {
+                temp[0] -= this.options.snapToGrid;
+            }
+            if(diffY < 0) {
+                temp[1] -= this.options.snapToGrid;
+            }
+        }
 
         diffX -= (Math.abs(temp[0]) < this.options.snapToGrid / 2 ?
                   temp[0] :
@@ -440,7 +446,7 @@
         return [diffX, diffY];
     };
 
-    ResizeHandler.prototype.checkAspectRatio = function (snap) {
+    ResizeHandler.prototype.checkAspectRatio = function (snap, isReverse) {
         if (!this.options.saveAspectRatio) {
             return snap;
         }
@@ -454,13 +460,14 @@
         if (newAspectRatio < aspectRatio) {
             // Height is too big. Adapt it
             updatedSnap[1] = newW / aspectRatio - this.parameters.box.height;
+            isReverse && (updatedSnap[1] = -updatedSnap[1]);
         } else if (newAspectRatio > aspectRatio) {
             // Width is too big. Adapt it
             updatedSnap[0] = this.parameters.box.width - newH * aspectRatio;
+            isReverse && (updatedSnap[0] = -updatedSnap[0]);
         }
 
         return updatedSnap;
-
     };
 
     SVG.extend(SVG.Element, {

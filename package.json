@@ -1,5 +1,5 @@
 {
-  "name": "svg.resize.js",
+  "name": "@4keys/svg.resize.js",
   "version": "1.4.2",
   "description": "An extension for svg.js which allows to resize elements which are selected",
   "keywords": [
