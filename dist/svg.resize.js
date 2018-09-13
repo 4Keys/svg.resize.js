@@ -1,6 +1,6 @@
 /*!
 * @4keys/svg.resize.js - An extension for svg.js which allows to resize elements which are selected
-* @version 1.4.2
+* @version 1.4.3
 * https://github.com/svgdotjs/svg.resize.js
 *
 * @copyright [object Object]
@@ -295,12 +295,12 @@
                     // end minus middle
                     var pAngle = Math.atan2((current.y - this.parameters.box.y - this.parameters.box.height / 2), (current.x - this.parameters.box.x - this.parameters.box.width / 2));
 
-                    var angle = (pAngle - sAngle) * 180 / Math.PI;
+                    var angle = this.parameters.rotation + (pAngle - sAngle) * 180 / Math.PI + this.options.snapToAngle / 2;
 
                     // We have to move the element to the center of the box first and change the rotation afterwards
                     // because rotation always works around a rotation-center, which is changed when moving the element
                     // We also set the new rotation center to the center of the box.
-                    this.el.center(this.parameters.box.cx, this.parameters.box.cy).rotate(this.parameters.rotation + angle - angle % this.options.snapToAngle, this.parameters.box.cx, this.parameters.box.cy);
+                    this.el.center(this.parameters.box.cx, this.parameters.box.cy).rotate(angle - (angle % this.options.snapToAngle), this.parameters.box.cx, this.parameters.box.cy);
                 };
                 break;
 
@@ -393,13 +393,13 @@
             // We check if the flag is set and if not we set a default-value (both bits set - which means upper-left-edge)
             flag = flag == null ? 1 | 1 << 1 : flag;
             temp = [(this.parameters.box.x + diffX + (flag & 1 ? 0 : this.parameters.box.width)) % this.options.snapToGrid, (this.parameters.box.y + diffY + (flag & (1 << 1) ? 0 : this.parameters.box.height)) % this.options.snapToGrid];
+        }
 
-            if(diffX < 0) {
-                temp[0] -= this.options.snapToGrid;
-            }
-            if(diffY < 0) {
-                temp[1] -= this.options.snapToGrid;
-            }
+        if(diffX < 0) {
+            temp[0] -= this.options.snapToGrid;
+        }
+        if(diffY < 0) {
+            temp[1] -= this.options.snapToGrid;
         }
 
         diffX -= (Math.abs(temp[0]) < this.options.snapToGrid / 2 ?
